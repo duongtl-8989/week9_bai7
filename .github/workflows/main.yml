@@ -1,7 +1,8 @@
 name: Automated Code Review
 
 on:
-  # Trigger khi có Pull Request hướng vào nhánh main
+  push:
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 

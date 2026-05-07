@@ -1,0 +1,37 @@
+name: Automated Code Review
+
+on:
+  # Trigger khi có Pull Request hướng vào nhánh main
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    # Cần quyền write để Bot có thể đăng bình luận vào PR
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Chạy Checkstyle và xuất kết quả ra file xml
+      - name: Run Checkstyle
+        run: mvn checkstyle:checkstyle
+
+      # Gửi phản hồi trực tiếp (Inline Feedback) vào PR
+      - name: Checkstyle Reviewer
+        uses: dbelyaev/action-checkstyle@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: warning
+          # Đường dẫn file kết quả checkstyle mặc định của Maven
+          checkstyle_config: google_checks.xml
